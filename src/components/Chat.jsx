@@ -170,6 +170,8 @@ function Chat() {
               name={name}
               photoURL={photoURL}
               email={email}
+              setReRender= {setReRender}
+              reRender= {reRender}
             />
           );
         })}

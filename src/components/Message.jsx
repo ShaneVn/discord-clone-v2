@@ -6,10 +6,12 @@ import { TrashIcon } from "@heroicons/react/solid";
 import { useSelector } from "react-redux";
 import { selectChannelId } from "../features/channelSlice";
 import { db } from "../firebase";
+import { selectServerId } from "../features/serverSlice";
 
-function Message({ message, timestamp, name, photoURL, id, email }) {
+function Message({ message, timestamp, name, photoURL, id, email, reRender, setReRender }) {
   const [user] = useAuthState(auth);
   const channelId = useSelector(selectChannelId);
+  const serverId = useSelector(selectServerId)
 
   return (
     <div className="flex items-center p-1 pl-5 my-5 mr-2 hover:bg-[#32353B] group">
@@ -34,11 +36,15 @@ function Message({ message, timestamp, name, photoURL, id, email }) {
         <div
           className="flex items-center p-1 ml-auto rounded-sm cursor-pointer text-[#b9bbbe] hover:bg-[#40444b] "
           onClick={() => {
-            db.collection("channels")
+            db.collection("servers")
+              .doc(serverId)
+              .collection("channels")
               .doc(channelId)
               .collection("messages")
               .doc(id)
               .delete();
+
+              setReRender(!reRender)
           }}
         >
           <TrashIcon className="h-5 hidden group-hover:inline" />
