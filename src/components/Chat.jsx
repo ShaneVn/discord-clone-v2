@@ -16,25 +16,81 @@ import { useSelector } from "react-redux";
 import { selectChannelId, selectChannelName } from "../features/channelSlice";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../firebase";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import firebase from "firebase/compat/app";
 import { useCollection } from "react-firebase-hooks/firestore";
 import Message from "./Message";
+import { selectServerId } from "../features/serverSlice";
+import { useState } from "react";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
+import { useParams } from "react-router-dom";
 
 function Chat() {
   const channelId = useSelector(selectChannelId);
+  const serverId = useSelector(selectServerId);
   const channelName = useSelector(selectChannelName);
   const [user] = useAuthState(auth);
-  const [message] = useCollection(
-    channelId &&
-      db
-        .collection("channels")
-        .doc(channelId)
-        .collection("messages")
-        .orderBy("timestamp", "asc")
-  );
+  const [message, setMessage] = useState([]);
   const inputRef = useRef("");
   const chatRef = useRef(null);
+  const [reRender, setReRender] = useState(false);
+
+  // useEffect(
+  //   () =>
+  //     onSnapshot(
+  //       query(
+  //         collection(db, "servers", serverId, "channels", channelId, "messages"),
+  //         orderBy("timestamp", "asc")
+  //       ),
+  //       (snapshot) => setMessage(snapshot.docs)
+  //     ),
+  //   []
+  // );
+
+  useEffect(() => {
+    if (channelId && serverId) {
+      const fetchMessage = async () => {
+        const messages = await getDocs(
+          query(
+            collection(
+              db,
+              "servers",
+              serverId,
+              "channels",
+              channelId,
+              "messages"
+            ),
+            orderBy("timestamp", "asc")
+          )
+        );
+
+        setMessage(messages.docs);
+      };
+
+      fetchMessage();
+    }
+  }, [serverId, channelId, reRender]);
+
+  console.log(serverId);
+  console.log(channelId);
+
+  // if (serverId && channelId) {
+  //   onSnapshot(
+  //     query(
+  //       collection(db, "servers", serverId, "channels", channelId, "messages"),
+  //       orderBy("timestamp", "asc")
+  //     ),
+  //     (snapshot) => setMessage(snapshot.docs)
+
+  //   );
+  // }
 
   const scrollToBottom = () => {
     chatRef.current.scrollIntoView({
@@ -48,18 +104,31 @@ function Chat() {
     e.preventDefault();
 
     if (inputRef.current.value !== "") {
-      db.collection("channels").doc(channelId).collection("messages").add({
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        message: inputRef.current.value,
-        name: user?.displayName,
-        photoURL: user?.photoURL,
-        email: user?.email,
-      });
+      addDoc(
+        collection(db, "servers", serverId, "channels", channelId, "messages"),
+        {
+          message: inputRef.current.value,
+          name: user?.displayName,
+          photoURL: user?.photoURL,
+          email: user?.email,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
     }
 
     inputRef.current.value = "";
     scrollToBottom();
+
+    setReRender(!reRender);
   };
+
+  // db.collection("channels").doc(channelId).collection("messages").add({
+  //   timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+  //   message: inputRef.current.value,
+  //   name: user?.displayName,
+  //   photoURL: user?.photoURL,
+  //   email: user?.email,
+  // });
 
   return (
     <div className="flex flex-col h-screen">
@@ -90,7 +159,7 @@ function Chat() {
         </div>
       </header>
       <main className="flex-grow overflow-y-scroll scrollbar-hide">
-        {message?.docs.map((doc) => {
+        {message?.map((doc) => {
           const { message, timestamp, name, photoURL, email } = doc.data();
           return (
             <Message

@@ -1,47 +1,151 @@
-import React from "react";
+import { useCallback, useEffect } from "react";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db, app } from "../firebase";
 import { Navigate } from "react-router-dom";
 import ServerIcon from "./ServerIcon";
-import { ChevronDownIcon, CogIcon, MicrophoneIcon, PhoneIcon, PlusIcon } from "@heroicons/react/outline";
+import {
+  ChevronDownIcon,
+  CogIcon,
+  MicrophoneIcon,
+  PhoneIcon,
+  PlusIcon,
+} from "@heroicons/react/outline";
 import Channel from "./Channel";
-import { addDoc, collection, getFirestore, query } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  getFirestore,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
 import firebase from "firebase/compat/app";
 import { useCollection } from "react-firebase-hooks/firestore";
 import Chat from "./Chat";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectServerId, setServerInfo } from "../features/serverSlice";
+import { useNavigate } from "react-router-dom";
+import { selectChannelId } from "../features/channelSlice";
 
 function Home() {
   const [user] = useAuthState(auth);
-  const [channels] = useCollection(db.collection("channels"));
 
-  
-// create channel to firebase
-  const handleAddChannel = () => {
+  // const [channels, setChannels] = useState();
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [servers, setServers] = useState();
+  const [channels, setChannels] = useState();
+
+  const [reRender, setReRender] = useState(false);
+
+  // const [firstServer, setFirstServer] = useState();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getDocs(collection(db, "servers"));
+
+      setServers(data.docs);
+
+      // console.log(data.docs[0].id);
+
+      dispatch(
+        setServerInfo({
+          serverId: data.docs[0].id,
+          serverName: data.docs[0].idserverName,
+        })
+      );
+
+      navigate(`/channels/${data.docs[0].id}`);
+
+      const channels = await getDocs(
+        collection(db, "servers", data.docs[0].id, "channels")
+      );
+
+      setChannels(channels.docs);
+    };
+
+    fetchData();
+  }, []);
+
+  //  const [channels] = useCollection(
+  //       db
+  //         .collection("servers")
+  //         .doc(servers.docs[0].data().id)
+  //         .collection("channels")
+  //         .orderBy("timestamp", "asc")
+  //   );
+
+  //  servers && onSnapshot(
+  //     query(collection(db, "servers", serverId, "channels")),
+  //     (snapshot) => {
+  //       setChannels(snapshot.docs);
+  //     }
+  //   );
+
+  const serverId = useSelector(selectServerId);
+  const channelId = useSelector(selectChannelId);
+
+  useEffect(() => {
+    const fetchChannels = async () => {
+      const channels = await getDocs(
+        collection(db, "servers", serverId, "channels")
+      );
+
+      setChannels(channels.docs);
+    };
+
+    fetchChannels();
+  }, [serverId, reRender]);
+
+  const addServer = async () => {
+    const name = prompt("Enter a name for the new server");
+
+    await addDoc(collection(db, "servers"), {
+      serverName: name,
+      timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    setReRender(!reRender);
+  };
+
+  // create channel to firebase
+  const handleAddChannel = async () => {
     const channelName = prompt("Enter a new channel name");
 
     if (channelName) {
-      db.collection("channels").add({
-        channelName: channelName,
-      });
+      try {
+        await addDoc(collection(db, "servers", serverId, "channels"), {
+          channelName: channelName,
+        });
+      } catch (error) {
+        // console.log(error);
+      }
     }
-  };
 
+    setReRender(!reRender);
+  };
 
   return (
     <>
       {!user && <Navigate replace to="/" />}
       <div className="flex h-screen">
         <div className="flex flex-col bg-discord_serverContainer space-y-3 p-3 min-w-max">
-          <div className="server-default hover:bg-discord_purple">
+          <div className="server-default hover:bg-discord_purple flex items-center justify-center">
             <img src="../topicon.png" alt="" className="h-5" />
           </div>
           <hr className="border-gray-700 border w-8 mx-auto" />
-          <ServerIcon image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3YraeeRnBhf1Sd-QQndtiCYLL5RTFWDhvjcooa9c8NqWeU6D0vP3x-3l1bfX5vskcToE&usqp=CAU" />
-          <ServerIcon image="https://cdn.iconscout.com/icon/free/png-256/javascript-2752148-2284965.png" />
-          <ServerIcon image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3YraeeRnBhf1Sd-QQndtiCYLL5RTFWDhvjcooa9c8NqWeU6D0vP3x-3l1bfX5vskcToE&usqp=CAU" />
-          <ServerIcon image="https://cdn.iconscout.com/icon/free/png-256/javascript-2752148-2284965.png" />
-          <div className="server-default hover:bg-discord_green group">
-            <PlusIcon className="text-discord_green h-7 group-hover:text-white" />
+          {servers?.map((server) => (
+            <ServerIcon key={server.id} id={server.id} server={server.data()} />
+          ))}
+
+          <div className="server-default hover:bg-discord_green group w-12">
+            <PlusIcon
+              onClick={addServer}
+              className="text-discord_green h-7 group-hover:text-white"
+            />
           </div>
         </div>
 
@@ -66,7 +170,7 @@ function Home() {
             </div>
 
             <div className="flex flex-col space-y-2 px-2 mb-4">
-              {channels?.docs.map((doc) => {
+              {channels?.map((doc) => {
                 return (
                   <Channel
                     id={doc.id}
@@ -78,43 +182,40 @@ function Home() {
             </div>
           </div>
 
-          <div className="flex bg-[#292b2f] p-2 justify-between items-center space-x-8  cursor-pointer" >
+          <div className="flex bg-[#292b2f] p-2 justify-between items-center space-x-8  cursor-pointer">
             <div className="flex items-center space-x-1 ">
-              
               <img
                 src={user?.photoURL}
                 alt=""
                 className="h-10 rounded-full"
                 onClick={() => auth.signOut()}
               />
-             
+
               <h4 className="text-white text-xs font-medium">
                 {user?.displayName}
-                <span className="text-[#b9bbbe] block">#{user?.uid.substring(0, 4)}</span>
+                <span className="text-[#b9bbbe] block">
+                  #{user?.uid.substring(0, 4)}
+                </span>
               </h4>
             </div>
 
             <div className="text-gray-400 flex items-center">
-              
               <div className="hover:bg-[#3a3c43] p-1 rounded-md ">
                 <MicrophoneIcon className="h-5 icon" />
               </div>
               <div className="hover:bg-[#3a3c43] p-1 rounded-md  ">
-                <PhoneIcon className="h-5 icon"/>
+                <PhoneIcon className="h-5 icon" />
               </div>
               <div className="hover:bg-[#3a3c43] p-1 rounded-md ">
-                <CogIcon className="h-5 icon"/>
+                <CogIcon className="h-5 icon" />
               </div>
-              
             </div>
           </div>
         </div>
 
-
-            <div className="bg-[#36393f] flex-grow">
-              <Chat/>
-            </div>
-         
+        <div className="bg-[#36393f] flex-grow">
+           <Chat />
+        </div>
       </div>
     </>
   );

@@ -2,6 +2,7 @@ import { HashtagIcon } from '@heroicons/react/outline'
 import { useDispatch, useSelector } from "react-redux";
 import { setChannelInfo, selectChannelId } from '../features/channelSlice';
 import { useNavigate } from 'react-router-dom';
+import { selectServerId } from '../features/serverSlice';
 
 
 
@@ -10,6 +11,7 @@ function Channel({id, channelName}) {
 const dispatch = useDispatch()
 const navigate = useNavigate()
 const channelId = useSelector(selectChannelId)
+const serverId = useSelector(selectServerId)
 
 
 const setChannel = () => {
@@ -20,7 +22,7 @@ const setChannel = () => {
     })
   )
 
-  navigate(`/channels/${id}`)
+  navigate(`/channels/${serverId}/${id}`)
 }
 
   return (
