@@ -112,9 +112,9 @@ function Home() {
     <>
       {!user && <Navigate replace to="/" />}
       <div className="flex h-screen">
-        <div className="flex flex-col bg-discord_serverContainer space-y-3 p-3 min-w-max">
+        <div className="flex flex-col bg-discord_serverContainer overflow-scroll scrollbar-hide  items-center  space-y-3 p-3 min-w-max">
           <div className="server-default hover:bg-discord_purple flex items-center justify-center">
-            <img src="../topicon.png" alt="" className="h-5" />
+            <img src="../topicon.png" alt="" className="h-10 p-2" />
           </div>
           <hr className="border-gray-700 border w-8 mx-auto" />
 
@@ -122,10 +122,10 @@ function Home() {
             <ServerIcon key={server.id} id={server.id} server={server.data()} />
           ))}
 
-          <div className="server-default hover:bg-discord_green group w-12">
+          <div className="server-default hover:bg-discord_green  p-3 group  ">
             <PlusIcon
               onClick={addServer}
-              className="text-discord_green h-7 group-hover:text-white"
+              className="text-discord_green w-7 h-7 group-hover:text-white"
             />
           </div>
         </div>

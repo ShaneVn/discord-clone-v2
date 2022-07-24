@@ -57,7 +57,7 @@ function ServerIcon({ server, id }) {
   return (
     <div
       className={`cursor-pointer rounded-full transition-all ease-out hover:rounded-2xl flex
-    items-center justify-center bg-[#36393f] w-12 h-12 ${
+    items-center justify-center bg-[#36393f] p-7 w-7 h-7 ${
       id === serverId && "bg-discord_purple rounded-2xl"
     }`}
       onClick={setServers}
