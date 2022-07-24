@@ -27,7 +27,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectServerId, setServerInfo } from "../features/serverSlice";
 import { useNavigate } from "react-router-dom";
-import { selectChannelId } from "../features/channelSlice";
+import { selectChannelId, setChannelInfo } from "../features/channelSlice";
 
 function Home() {
   const [user] = useAuthState(auth);
@@ -38,37 +38,57 @@ function Home() {
   const navigate = useNavigate();
   const [servers, setServers] = useState();
   const [channels, setChannels] = useState();
-
   const [reRender, setReRender] = useState(false);
+  const serverId = useSelector(selectServerId);
+  const channelId = useSelector(selectChannelId);
 
   // const [firstServer, setFirstServer] = useState();
 
+  useEffect(
+    () =>
+      onSnapshot(
+        collection(db, "servers"),
+        orderBy("timestamp", "desc"),
+        (snapshot) => {
+          setServers(snapshot.docs);
+          dispatch(
+            setServerInfo({
+              serverId: snapshot.docs[0].id,
+              serverName: snapshot.docs[0].idserverName,
+            })
+          );
+        }
+      ),
+
+    [db]
+  );
+
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getDocs(collection(db, "servers"));
+    if (serverId) {
+      onSnapshot(
+        collection(db, "servers", serverId, "channels"),
+        orderBy("timestamp", "desc"),
+        (snapshot) => {
+          setChannels(snapshot.docs);
 
-      setServers(data.docs);
-
-      // console.log(data.docs[0].id);
-
-      dispatch(
-        setServerInfo({
-          serverId: data.docs[0].id,
-          serverName: data.docs[0].idserverName,
-        })
+          dispatch(
+            setChannelInfo({
+              channelId: snapshot?.docs[0]?.id,
+              channelName: snapshot?.docs[0]?.channelName,
+            })
+          );
+        }
       );
+    }
+  }, [channels, serverId]);
 
-      navigate(`/channels/${data.docs[0].id}`);
+  // useEffect(() => {
+  //   const fetchData = async () => {
 
-      const channels = await getDocs(
-        collection(db, "servers", data.docs[0].id, "channels")
-      );
+  //   };
 
-      setChannels(channels.docs);
-    };
-
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   //  const [channels] = useCollection(
   //       db
@@ -85,20 +105,17 @@ function Home() {
   //     }
   //   );
 
-  const serverId = useSelector(selectServerId);
-  const channelId = useSelector(selectChannelId);
+  // useEffect(() => {
+  //   const fetchChannels = async () => {
+  //     const channels = await getDocs(
+  //       collection(db, "servers", serverId, "channels")
+  //     );
 
-  useEffect(() => {
-    const fetchChannels = async () => {
-      const channels = await getDocs(
-        collection(db, "servers", serverId, "channels")
-      );
+  //     setChannels(channels.docs);
+  //   };
 
-      setChannels(channels.docs);
-    };
-
-    fetchChannels();
-  }, [serverId, reRender]);
+  //   fetchChannels();
+  // }, [serverId, reRender]);
 
   const addServer = async () => {
     const name = prompt("Enter a name for the new server");
@@ -107,8 +124,6 @@ function Home() {
       serverName: name,
       timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
-
-    setReRender(!reRender);
   };
 
   // create channel to firebase
@@ -124,9 +139,9 @@ function Home() {
         // console.log(error);
       }
     }
-
-    setReRender(!reRender);
   };
+
+  // setServer
 
   return (
     <>
@@ -214,7 +229,7 @@ function Home() {
         </div>
 
         <div className="bg-[#36393f] flex-grow">
-           <Chat />
+          <Chat />
         </div>
       </div>
     </>

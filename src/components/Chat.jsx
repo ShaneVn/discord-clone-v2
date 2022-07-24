@@ -78,8 +78,7 @@ function Chat() {
     }
   }, [serverId, channelId, reRender]);
 
-  console.log(serverId);
-  console.log(channelId);
+ 
 
   // if (serverId && channelId) {
   //   onSnapshot(
