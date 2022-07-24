@@ -49,7 +49,7 @@ function ServerIcon({ server, id }) {
       }
     );
 
-    navigate(`/channels/${id}`);
+   
   };
 
   // ${id === serverId && 'bg-discord_purple'}
