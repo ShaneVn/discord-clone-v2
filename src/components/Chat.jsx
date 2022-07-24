@@ -40,21 +40,29 @@ function Chat() {
   const [message, setMessage] = useState([]);
   const inputRef = useRef("");
   const chatRef = useRef(null);
-  
 
   useEffect(() => {
     if (serverId && channelId) {
-      onSnapshot(query(
-        collection(db, "servers", serverId, "channels", channelId, "messages"),
-        orderBy("timestamp", "asc")),
+      onSnapshot(
+        query(
+          collection(
+            db,
+            "servers",
+            serverId,
+            "channels",
+            channelId,
+            "messages"
+          ),
+          orderBy("timestamp", "asc")
+        ),
         (snapshot) => {
           setMessage(snapshot.docs);
+          console.log(snapshot.docs);
         }
       );
     }
-  }, [serverId,channelId]);
+  }, [channelId, serverId]);
 
-  
   const scrollToBottom = () => {
     chatRef.current.scrollIntoView({
       behavior: "smooth",
@@ -81,11 +89,7 @@ function Chat() {
 
     inputRef.current.value = "";
     scrollToBottom();
-
-    
   };
-
-  
 
   return (
     <div className="flex flex-col h-screen">
@@ -127,7 +131,6 @@ function Chat() {
               name={name}
               photoURL={photoURL}
               email={email}
-              
             />
           );
         })}

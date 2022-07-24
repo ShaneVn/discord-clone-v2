@@ -41,10 +41,10 @@ function ServerIcon({ server, id }) {
         dispatch(
           setChannelInfo({
             channelId: snapshot?.docs[0]?.id,
-            channelName: snapshot?.docs[0]?.channelName,
+            channelName: snapshot?.docs[0]?.data().channelName,
           })
         );
-        console.log("this is channid ooo", channelId);
+
         navigate(`/channels/${id}/${channelId}`);
       }
     );
