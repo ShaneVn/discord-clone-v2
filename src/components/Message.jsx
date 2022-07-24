@@ -8,7 +8,7 @@ import { selectChannelId } from "../features/channelSlice";
 import { db } from "../firebase";
 import { selectServerId } from "../features/serverSlice";
 
-function Message({ message, timestamp, name, photoURL, id, email, reRender, setReRender }) {
+function Message({ message, timestamp, name, photoURL, id, email, }) {
   const [user] = useAuthState(auth);
   const channelId = useSelector(selectChannelId);
   const serverId = useSelector(selectServerId)
@@ -44,7 +44,7 @@ function Message({ message, timestamp, name, photoURL, id, email, reRender, setR
               .doc(id)
               .delete();
 
-              setReRender(!reRender)
+             
           }}
         >
           <TrashIcon className="h-5 hidden group-hover:inline" />

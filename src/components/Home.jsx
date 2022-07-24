@@ -38,7 +38,7 @@ function Home() {
   const navigate = useNavigate();
   const [servers, setServers] = useState();
   const [channels, setChannels] = useState();
-  const [reRender, setReRender] = useState(false);
+ 
   const serverId = useSelector(selectServerId);
   const channelId = useSelector(selectChannelId);
 
@@ -51,17 +51,26 @@ function Home() {
         orderBy("timestamp", "desc"),
         (snapshot) => {
           setServers(snapshot.docs);
+            
           dispatch(
             setServerInfo({
               serverId: snapshot.docs[0].id,
               serverName: snapshot.docs[0].idserverName,
             })
           );
+
+          console.log(snapshot.docs[0].id)
+          console.log(snapshot.docs)
+          console.log(servers)
+
         }
       ),
 
     [db]
   );
+
+
+ 
 
   useEffect(() => {
     if (serverId) {
@@ -77,10 +86,14 @@ function Home() {
               channelName: snapshot?.docs[0]?.channelName,
             })
           );
+
+
+          navigate(`/channels/${serverId}/${snapshot.docs[0].id}`)
+          
         }
       );
     }
-  }, [channels, serverId]);
+  }, [dispatch, serverId]);
 
   // useEffect(() => {
   //   const fetchData = async () => {
@@ -152,6 +165,7 @@ function Home() {
             <img src="../topicon.png" alt="" className="h-5" />
           </div>
           <hr className="border-gray-700 border w-8 mx-auto" />
+
           {servers?.map((server) => (
             <ServerIcon key={server.id} id={server.id} server={server.data()} />
           ))}

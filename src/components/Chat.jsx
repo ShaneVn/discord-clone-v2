@@ -40,45 +40,43 @@ function Chat() {
   const [message, setMessage] = useState([]);
   const inputRef = useRef("");
   const chatRef = useRef(null);
-  const [reRender, setReRender] = useState(false);
-
-  // useEffect(
-  //   () =>
-  //     onSnapshot(
-  //       query(
-  //         collection(db, "servers", serverId, "channels", channelId, "messages"),
-  //         orderBy("timestamp", "asc")
-  //       ),
-  //       (snapshot) => setMessage(snapshot.docs)
-  //     ),
-  //   []
-  // );
+  
 
   useEffect(() => {
-    if (channelId && serverId) {
-      const fetchMessage = async () => {
-        const messages = await getDocs(
-          query(
-            collection(
-              db,
-              "servers",
-              serverId,
-              "channels",
-              channelId,
-              "messages"
-            ),
-            orderBy("timestamp", "asc")
-          )
-        );
-
-        setMessage(messages.docs);
-      };
-
-      fetchMessage();
+    if (serverId && channelId) {
+      onSnapshot(query(
+        collection(db, "servers", serverId, "channels", channelId, "messages"),
+        orderBy("timestamp", "asc")),
+        (snapshot) => {
+          setMessage(snapshot.docs);
+        }
+      );
     }
-  }, [serverId, channelId, reRender]);
+  }, [serverId,channelId]);
 
- 
+  // useEffect(() => {
+  //   if (channelId && serverId) {
+  //     const fetchMessage = async () => {
+  //       const messages = await getDocs(
+  //         query(
+  //           collection(
+  //             db,
+  //             "servers",
+  //             serverId,
+  //             "channels",
+  //             channelId,
+  //             "messages"
+  //           ),
+  //           orderBy("timestamp", "asc")
+  //         )
+  //       );
+
+  //       setMessage(messages.docs);
+  //     };
+
+  //     fetchMessage();
+  //   }
+  // }, [serverId, channelId, reRender]);
 
   // if (serverId && channelId) {
   //   onSnapshot(
@@ -118,7 +116,7 @@ function Chat() {
     inputRef.current.value = "";
     scrollToBottom();
 
-    setReRender(!reRender);
+    
   };
 
   // db.collection("channels").doc(channelId).collection("messages").add({
@@ -169,8 +167,7 @@ function Chat() {
               name={name}
               photoURL={photoURL}
               email={email}
-              setReRender= {setReRender}
-              reRender= {reRender}
+              
             />
           );
         })}
