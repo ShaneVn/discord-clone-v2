@@ -57,11 +57,13 @@ function Chat() {
         ),
         (snapshot) => {
           setMessage(snapshot.docs);
-          console.log(snapshot.docs);
+          console.log(message.length)
         }
+        
       );
     }
-  }, [channelId, serverId]);
+  }, [ channelId, message.length]);
+
 
   const scrollToBottom = () => {
     chatRef.current.scrollIntoView({

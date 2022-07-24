@@ -46,8 +46,6 @@ function Home() {
         query(collection(db, "servers"), orderBy("timeStamp", "desc")),
         (snapshot) => {
           setServers(snapshot.docs);
-
-          console.log(snapshot.docs);
           dispatch(
             setServerInfo({
               serverId: snapshot.docs[0].id,
@@ -59,6 +57,7 @@ function Home() {
 
     [db]
   );
+  
 
   useEffect(() => {
     if (serverId) {
@@ -67,8 +66,6 @@ function Home() {
         // orderBy("timeStamp", "desc"),
         (snapshot) => {
           setChannels(snapshot.docs);
-
-         
 
           dispatch(
             setChannelInfo({
@@ -82,6 +79,9 @@ function Home() {
       );
     }
   }, [serverId]);
+
+  console.log('this is serverId from home', serverId)
+  console.log('this is channelId from home', channelId)
 
   const addServer = async () => {
     const name = prompt("Enter a name for the new server");

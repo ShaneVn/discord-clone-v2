@@ -45,7 +45,24 @@ function ServerIcon({ server, id }) {
           })
         );
 
-        navigate(`/channels/${id}/${channelId}`);
+        if (serverId) {
+          onSnapshot(
+            collection(db, "servers", serverId, "channels"),
+            // orderBy("timeStamp", "desc"),
+            (snapshot) => {
+              setChannels(snapshot.docs);
+
+              dispatch(
+                setChannelInfo({
+                  channelId: snapshot?.docs[0]?.id,
+                  channelName: snapshot?.docs[0]?.data().channelName,
+                })
+              );
+
+              navigate(`/channels/${serverId}/${snapshot.docs[0].id}`);
+            }
+          );
+        }
       }
     );
 
@@ -54,6 +71,8 @@ function ServerIcon({ server, id }) {
 
   // ${id === serverId && 'bg-discord_purple'}
 
+  console.log("this is serverId from sever", serverId);
+  console.log("this is channelId from server", channelId);
   return (
     <div
       className={`cursor-pointer rounded-full transition-all ease-out hover:rounded-2xl flex
