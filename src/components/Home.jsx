@@ -32,17 +32,13 @@ import { selectChannelId, setChannelInfo } from "../features/channelSlice";
 function Home() {
   const [user] = useAuthState(auth);
 
-  // const [channels, setChannels] = useState();
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [servers, setServers] = useState();
   const [channels, setChannels] = useState();
- 
+
   const serverId = useSelector(selectServerId);
   const channelId = useSelector(selectChannelId);
-
-  // const [firstServer, setFirstServer] = useState();
 
   useEffect(
     () =>
@@ -51,26 +47,18 @@ function Home() {
         orderBy("timestamp", "desc"),
         (snapshot) => {
           setServers(snapshot.docs);
-            
+
           dispatch(
             setServerInfo({
               serverId: snapshot.docs[0].id,
               serverName: snapshot.docs[0].idserverName,
             })
           );
-
-          console.log(snapshot.docs[0].id)
-          console.log(snapshot.docs)
-          console.log(servers)
-
         }
       ),
 
     [db]
   );
-
-
- 
 
   useEffect(() => {
     if (serverId) {
@@ -87,48 +75,11 @@ function Home() {
             })
           );
 
-
-          navigate(`/channels/${serverId}/${snapshot.docs[0].id}`)
-          
+          navigate(`/channels/${serverId}/${snapshot.docs[0].id}`);
         }
       );
     }
   }, [dispatch, serverId]);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-
-  //   };
-
-  //   fetchData();
-  // }, []);
-
-  //  const [channels] = useCollection(
-  //       db
-  //         .collection("servers")
-  //         .doc(servers.docs[0].data().id)
-  //         .collection("channels")
-  //         .orderBy("timestamp", "asc")
-  //   );
-
-  //  servers && onSnapshot(
-  //     query(collection(db, "servers", serverId, "channels")),
-  //     (snapshot) => {
-  //       setChannels(snapshot.docs);
-  //     }
-  //   );
-
-  // useEffect(() => {
-  //   const fetchChannels = async () => {
-  //     const channels = await getDocs(
-  //       collection(db, "servers", serverId, "channels")
-  //     );
-
-  //     setChannels(channels.docs);
-  //   };
-
-  //   fetchChannels();
-  // }, [serverId, reRender]);
 
   const addServer = async () => {
     const name = prompt("Enter a name for the new server");
@@ -211,14 +162,9 @@ function Home() {
             </div>
           </div>
 
-          <div className="flex bg-[#292b2f] p-2 justify-between items-center space-x-8  cursor-pointer">
+          <div className="flex bg-[#292b2f] p-2 justify-between items-center space-x-8  cursor-pointer pr-4">
             <div className="flex items-center space-x-1 ">
-              <img
-                src={user?.photoURL}
-                alt=""
-                className="h-10 rounded-full"
-                onClick={() => auth.signOut()}
-              />
+              <img src={user?.photoURL} alt="" className="h-10 rounded-full" />
 
               <h4 className="text-white text-xs font-medium">
                 {user?.displayName}
@@ -228,16 +174,13 @@ function Home() {
               </h4>
             </div>
 
-            <div className="text-gray-400 flex items-center">
-              <div className="hover:bg-[#3a3c43] p-1 rounded-md ">
-                <MicrophoneIcon className="h-5 icon" />
-              </div>
-              <div className="hover:bg-[#3a3c43] p-1 rounded-md  ">
-                <PhoneIcon className="h-5 icon" />
-              </div>
-              <div className="hover:bg-[#3a3c43] p-1 rounded-md ">
-                <CogIcon className="h-5 icon" />
-              </div>
+            <div className="hover:bg-[#3a3c43] p-2 rounded-md mr-5">
+              <h1
+                onClick={() => auth.signOut()}
+                className="font-bold text-white mx-auto "
+              >
+                Logout
+              </h1>
             </div>
           </div>
         </div>

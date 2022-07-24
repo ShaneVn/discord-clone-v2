@@ -54,41 +54,7 @@ function Chat() {
     }
   }, [serverId,channelId]);
 
-  // useEffect(() => {
-  //   if (channelId && serverId) {
-  //     const fetchMessage = async () => {
-  //       const messages = await getDocs(
-  //         query(
-  //           collection(
-  //             db,
-  //             "servers",
-  //             serverId,
-  //             "channels",
-  //             channelId,
-  //             "messages"
-  //           ),
-  //           orderBy("timestamp", "asc")
-  //         )
-  //       );
-
-  //       setMessage(messages.docs);
-  //     };
-
-  //     fetchMessage();
-  //   }
-  // }, [serverId, channelId, reRender]);
-
-  // if (serverId && channelId) {
-  //   onSnapshot(
-  //     query(
-  //       collection(db, "servers", serverId, "channels", channelId, "messages"),
-  //       orderBy("timestamp", "asc")
-  //     ),
-  //     (snapshot) => setMessage(snapshot.docs)
-
-  //   );
-  // }
-
+  
   const scrollToBottom = () => {
     chatRef.current.scrollIntoView({
       behavior: "smooth",
