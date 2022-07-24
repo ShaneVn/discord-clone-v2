@@ -43,11 +43,11 @@ function Home() {
   useEffect(
     () =>
       onSnapshot(
-        collection(db, "servers"),
-        orderBy("timestamp", "desc"),
+        query(collection(db, "servers"), orderBy("timeStamp", "desc")),
         (snapshot) => {
           setServers(snapshot.docs);
 
+          console.log(snapshot.docs);
           dispatch(
             setServerInfo({
               serverId: snapshot.docs[0].id,
@@ -64,7 +64,7 @@ function Home() {
     if (serverId) {
       onSnapshot(
         collection(db, "servers", serverId, "channels"),
-        orderBy("timestamp", "desc"),
+        // orderBy("timeStamp", "desc"),
         (snapshot) => {
           setChannels(snapshot.docs);
 
@@ -79,7 +79,7 @@ function Home() {
         }
       );
     }
-  }, [dispatch, serverId]);
+  }, [serverId]);
 
   const addServer = async () => {
     const name = prompt("Enter a name for the new server");
@@ -98,6 +98,7 @@ function Home() {
       try {
         await addDoc(collection(db, "servers", serverId, "channels"), {
           channelName: channelName,
+          timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
         });
       } catch (error) {
         // console.log(error);

@@ -85,13 +85,7 @@ function Chat() {
     
   };
 
-  // db.collection("channels").doc(channelId).collection("messages").add({
-  //   timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-  //   message: inputRef.current.value,
-  //   name: user?.displayName,
-  //   photoURL: user?.photoURL,
-  //   email: user?.email,
-  // });
+  
 
   return (
     <div className="flex flex-col h-screen">
