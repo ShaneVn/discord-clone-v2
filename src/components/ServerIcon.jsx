@@ -34,39 +34,20 @@ function ServerIcon({ server, id }) {
     );
 
     onSnapshot(
-      collection(db, "servers", serverId, "channels"),
+      collection(db, "servers", id, "channels"),
       orderBy("timestamp", "desc"),
       (snapshot) => {
         setChannels(snapshot);
         dispatch(
           setChannelInfo({
-            channelId: snapshot?.docs[0]?.id,
-            channelName: snapshot?.docs[0]?.data().channelName,
+            channelId: channels?.docs[0]?.id,
+            channelName: channels?.docs[0]?.data().channelName,
           })
         );
 
-        if (serverId) {
-          onSnapshot(
-            collection(db, "servers", serverId, "channels"),
-            // orderBy("timeStamp", "desc"),
-            (snapshot) => {
-              setChannels(snapshot.docs);
-
-              dispatch(
-                setChannelInfo({
-                  channelId: snapshot?.docs[0]?.id,
-                  channelName: snapshot?.docs[0]?.data().channelName,
-                })
-              );
-
-              navigate(`/channels/${serverId}/${snapshot.docs[0]?.id}`);
-            }
-          );
-        }
+        navigate(`/channels/${id}/${channels?.docs[0]?.id}`);
       }
     );
-
- 
   };
   return (
     <div
