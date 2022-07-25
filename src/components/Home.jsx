@@ -73,14 +73,14 @@ function Home() {
             })
           );
 
-          navigate(`/channels/${serverId}/${snapshot.docs[0].id}`);
+          navigate(`/channels/${serverId}/${snapshot?.docs[0]?.id}`);
         }
       );
     }
   }, [serverId]);
 
-  console.log("this is serverId from home", serverId);
-  console.log("this is channelId from home", channelId);
+  console.log("this is serverId from home", channelId);
+ 
 
   const addServer = async () => {
     const name = prompt("Enter a name for the new server");
@@ -90,12 +90,10 @@ function Home() {
       timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
 
-     
-
     // add default channell
     if (docRef) {
       await addDoc(collection(db, "servers", docRef.id, "channels"), {
-        channelName: "general",
+        channelName: "general", 
         timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
       });
     }
