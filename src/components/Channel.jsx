@@ -49,12 +49,13 @@ function Channel({ id, channelName }) {
         }
       );
     }
-  }, []);
+  }, [channelId]);
+  console.log('sdsd')
 
   const setChannel = () => {
     dispatch(
       setChannelInfo({
-        channelId : id,
+        channelId : id|null,
         channelName : channelName
       })
     )

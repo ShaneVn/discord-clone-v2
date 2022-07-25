@@ -59,7 +59,7 @@ function ServerIcon({ server, id }) {
                 })
               );
 
-              navigate(`/channels/${serverId}/${snapshot.docs[0].id}`);
+              navigate(`/channels/${serverId}/${snapshot.docs[0]?.id}`);
             }
           );
         }

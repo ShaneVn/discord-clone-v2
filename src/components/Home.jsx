@@ -57,7 +57,6 @@ function Home() {
 
     [db]
   );
-  
 
   useEffect(() => {
     if (serverId) {
@@ -80,16 +79,26 @@ function Home() {
     }
   }, [serverId]);
 
-  console.log('this is serverId from home', serverId)
-  console.log('this is channelId from home', channelId)
+  console.log("this is serverId from home", serverId);
+  console.log("this is channelId from home", channelId);
 
   const addServer = async () => {
     const name = prompt("Enter a name for the new server");
 
-    await addDoc(collection(db, "servers"), {
+    const docRef = await addDoc(collection(db, "servers"), {
       serverName: name,
       timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
+
+     
+
+    // add default channell
+    if (docRef) {
+      await addDoc(collection(db, "servers", docRef.id, "channels"), {
+        channelName: "general",
+        timeStamp: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }
   };
 
   // create channel to firebase

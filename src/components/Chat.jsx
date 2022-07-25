@@ -62,7 +62,7 @@ function Chat() {
         
       );
     }
-  }, [ channelId, message.length]);
+  }, [serverId, channelId, message.length]);
 
 
   const scrollToBottom = () => {
