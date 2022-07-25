@@ -52,10 +52,20 @@ function Chat() {
         ),
         (snapshot) => {
           setMessage(snapshot.docs);
+ rufans
+          console.log(message.length)
+
+ main
         }
+        
       );
     }
+ rufans
+  }, [serverId, channelId, message.length]);
+
+
   }, [id, serverId]);
+ main
 
   const scrollToBottom = () => {
     chatRef.current.scrollIntoView({
