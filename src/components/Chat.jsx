@@ -33,6 +33,7 @@ import {
 import { useParams } from "react-router-dom";
 
 function Chat() {
+  const channelId = useSelector(selectChannelId);
   const serverId = useSelector(selectServerId);
   const channelName = useSelector(selectChannelName);
   const [user] = useAuthState(auth);
@@ -40,32 +41,29 @@ function Chat() {
   const inputRef = useRef("");
   const chatRef = useRef(null);
 
-  // this id is the channelid
-  const { id } = useParams();
-
   useEffect(() => {
-    if (serverId && id) {
+    if (serverId && channelId) {
       onSnapshot(
         query(
-          collection(db, "servers", serverId, "channels", id, "messages"),
+          collection(
+            db,
+            "servers",
+            serverId,
+            "channels",
+            channelId,
+            "messages"
+          ),
           orderBy("timestamp", "asc")
         ),
         (snapshot) => {
           setMessage(snapshot.docs);
- rufans
           console.log(message.length)
-
- main
         }
         
       );
     }
- rufans
   }, [serverId, channelId, message.length]);
 
-
-  }, [id, serverId]);
- main
 
   const scrollToBottom = () => {
     chatRef.current.scrollIntoView({
@@ -79,13 +77,16 @@ function Chat() {
     e.preventDefault();
 
     if (inputRef.current.value !== "") {
-      addDoc(collection(db, "servers", serverId, "channels", id, "messages"), {
-        message: inputRef.current.value,
-        name: user?.displayName,
-        photoURL: user?.photoURL,
-        email: user?.email,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      });
+      addDoc(
+        collection(db, "servers", serverId, "channels", channelId, "messages"),
+        {
+          message: inputRef.current.value,
+          name: user?.displayName,
+          photoURL: user?.photoURL,
+          email: user?.email,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+      );
     }
 
     inputRef.current.value = "";
@@ -143,9 +144,9 @@ function Chat() {
         <form className="flex-grow">
           <input
             type="text"
-            disabled={!id}
+            disabled={!channelId}
             placeholder={
-              id ? `Message #${channelName}` : "Please Select a Channel"
+              channelId ? `Message #${channelName}` : "Please Select a Channel"
             }
             className="bg-transparent focus:outline-none text-[#dcddde] w-full placeholder-[#72767d] text-sm"
             ref={inputRef}

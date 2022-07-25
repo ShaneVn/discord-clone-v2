@@ -66,13 +66,8 @@ function ServerIcon({ server, id }) {
       }
     );
 
-   
+ 
   };
-
-  // ${id === serverId && 'bg-discord_purple'}
-
-  console.log("this is serverId from sever", serverId);
-  console.log("this is channelId from server", channelId);
   return (
     <div
       className={`cursor-pointer rounded-full transition-all ease-out hover:rounded-2xl flex
